@@ -1,0 +1,21 @@
+{
+  "name": "iot-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w apps/api",
+    "dev": "npm run dev -w apps/api",
+    "lint": "eslint . --ignore-pattern 'apps/**/dist/*' --ignore-pattern 'node_modules/*'",
+    "format": "prettier -w .",
+    "test": "npm run test -w apps/api"
+  },
+  "devDependencies": {
+    "eslint": "^9.7.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  }
+}
