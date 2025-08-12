@@ -8,7 +8,7 @@
   "scripts": {
     "build": "npm run build -w apps/api",
     "dev": "npm run dev -w apps/api",
-    "lint": "eslint . --ignore-pattern 'apps/**/dist/*' --ignore-pattern 'node_modules/*'",
+    "lint": "eslint . --ignore-pattenpm i -w apps/api @nestjs/swagger swagger-ui-express class-validator class-transformer\nrn 'apps/**/dist/*' --ignore-pattern 'node_modules/*'",
     "format": "prettier -w .",
     "test": "npm run test -w apps/api"
   },
