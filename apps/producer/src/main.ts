@@ -58,15 +58,15 @@ function* fromSampleFile(path: string, chunkSize: number) {
 
     const msgs = [...fromSampleFile(SAMPLE, CHUNK_SIZE)];
     if (!msgs.length) {
-        console.error(`❌ No valid messages found in ${SAMPLE}`);
+        console.error(`No valid messages found in ${SAMPLE}`);
         process.exit(1);
     }
-    console.log(`✅ Producer: loaded ${msgs.length} message(s) from ${SAMPLE}`);
+    console.log(`Producer: loaded ${msgs.length} message(s) from ${SAMPLE}`);
 
     let i = 0;
     const send = () => {
         if (i >= msgs.length) {
-            console.log('✅ All messages sent. Exiting...');
+            console.log('All messages sent. Exiting...');
             ch.close().finally(() => conn.close().finally(() => process.exit(0)));
             return;
         }
