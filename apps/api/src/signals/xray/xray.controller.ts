@@ -32,4 +32,30 @@ export class XRayController {
     remove(@Param('id') id: string) {
         return this.service.remove(id);
     }
+
+    @Get('metrics/overview')
+    overview(@Query('from') from?: number, @Query('to') to?: number, @Query('deviceId') deviceId?: string) {
+        return this.service.overview({ from: from ? +from : undefined, to: to ? +to : undefined, deviceId });
+    }
+
+    @Get('metrics/timeseries')
+    timeseries(
+        @Query('from') from?: number,
+        @Query('to') to?: number,
+        @Query('deviceId') deviceId?: string,
+        @Query('interval') interval?: 'hour'|'day',
+    ) {
+        return this.service.timeseries({ from: from ? +from : undefined, to: to ? +to : undefined, deviceId, interval });
+    }
+
+    @Get('metrics/top-devices')
+    topDevices(@Query('from') from?: number, @Query('to') to?: number, @Query('limit') limit?: number) {
+        return this.service.topDevices({ from: from ? +from : undefined, to: to ? +to : undefined, limit: limit ? +limit : undefined });
+    }
+
+    @Get('metrics/histogram')
+    histogram(@Query('field') field?: 'dataLength', @Query('bins') bins?: number, @Query('from') from?: number, @Query('to') to?: number) {
+        return this.service.histogram({ field, bins: bins ? +bins : undefined, from: from ? +from : undefined, to: to ? +to : undefined });
+    }
 }
+
