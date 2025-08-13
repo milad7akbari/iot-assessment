@@ -10,18 +10,18 @@ export class HealthController {
         @InjectConnection() private readonly conn: Connection,
     ) {}
 
-    @Get('app')
-    app() {
-        return { ok: true, service: 'api' };
-    }
+    @Get('app') app() { return { ok: true, service: 'api' }; }
 
-    @Get('mq')
-    async mqHealth() {
-        return this.mq.ping();
-    }
+    @Get('live') live() { return { ok: true }; }
 
-    @Get('db')
-    db() {
-        return { connected: this.conn.readyState === 1 };
+    @Get('mq')   async mqHealth() { return this.mq.ping(); }
+
+    @Get('db')   db() { return { connected: this.conn.readyState === 1 }; }
+
+    @Get('ready')
+    async ready() {
+        const mq = await this.mq.ping();
+        const db = this.conn.readyState === 1;
+        return { ok: mq.connected && db, mq, db };
     }
 }

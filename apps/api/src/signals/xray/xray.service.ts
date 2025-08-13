@@ -34,7 +34,7 @@ export class XRayService {
         if (q.from || q.to) {
             filter.timestamp = {};
             if (q.from) filter.timestamp!.$gte = q.from;
-            if (q.to) filter.timestamp!.$lte = q.to;
+            if (q.to)   filter.timestamp!.$lte = q.to;
         }
 
         if (q.minDataLength !== undefined || q.maxDataLength !== undefined) {
@@ -44,17 +44,15 @@ export class XRayService {
         }
 
         const sortField = q.sortBy ?? 'timestamp';
-        const sortDir = (q.sortDir === 'asc' ? 1 : -1) as 1 | -1;
+        const sortDir   = (q.sortDir === 'asc' ? 1 : -1) as 1 | -1;
+        const limit     = Math.min(Math.max(q.limit ?? 50, 1), 200);
+        const skip      = Math.max(q.skip ?? 0, 0);
 
         const query = this.model
-            .find(filter)
+            .find(filter, { __v: 0 })
             .sort({ [sortField]: sortDir })
-            .skip(q.skip ?? 0)
-            .limit(Math.min(q.limit ?? 50, 200));
-
-        if (sortField === 'timestamp') {
-            query.hint({ deviceId: 1, timestamp: -1 } as any);
-        }
+            .skip(skip)
+            .limit(limit);
 
         return query.lean();
     }
@@ -77,30 +75,26 @@ export class XRayService {
         if (r.from || r.to) {
             match.timestamp = {};
             if (r.from) match.timestamp.$gte = r.from;
-            if (r.to) match.timestamp.$lte = r.to;
+            if (r.to)   match.timestamp.$lte = r.to;
         }
 
         const [doc] = await this.model.aggregate([
             { $match: match },
-            {
-                $group: {
+            { $group: {
                     _id: null,
                     count: { $sum: 1 },
                     devices: { $addToSet: '$deviceId' },
                     minTs: { $min: '$timestamp' },
                     maxTs: { $max: '$timestamp' },
                     avgLen: { $avg: '$dataLength' },
-                },
-            },
-            {
-                $project: {
+                } },
+            { $project: {
                     _id: 0,
                     count: 1,
                     devicesCount: { $size: '$devices' },
                     timeRange: { from: '$minTs', to: '$maxTs' },
                     avgDataLength: { $round: ['$avgLen', 2] },
-                },
-            },
+                } },
         ]);
 
         return doc ?? { count: 0, devicesCount: 0 };
@@ -112,28 +106,24 @@ export class XRayService {
         if (from || to) {
             match.timestamp = {};
             if (from) match.timestamp.$gte = from;
-            if (to) match.timestamp.$lte = to;
+            if (to)   match.timestamp.$lte = to;
         }
 
         return this.model.aggregate([
             { $match: match },
             { $addFields: { tsDate: { $toDate: '$timestamp' } } },
-            {
-                $group: {
+            { $group: {
                     _id: { t: { $dateTrunc: { date: '$tsDate', unit: interval } }, d: '$deviceId' },
                     count: { $sum: 1 },
                     avgLen: { $avg: '$dataLength' },
-                },
-            },
-            {
-                $project: {
+                } },
+            { $project: {
                     _id: 0,
                     deviceId: '$_id.d',
                     time: '$_id.t',
                     count: 1,
                     avgDataLength: { $round: ['$avgLen', 2] },
-                },
-            },
+                } },
             { $sort: { time: 1 } },
         ]);
     }
@@ -143,28 +133,24 @@ export class XRayService {
         if (from || to) {
             match.timestamp = {};
             if (from) match.timestamp.$gte = from;
-            if (to) match.timestamp.$lte = to;
+            if (to)   match.timestamp.$lte = to;
         }
 
         return this.model.aggregate([
             { $match: match },
-            {
-                $group: {
+            { $group: {
                     _id: '$deviceId',
                     count: { $sum: 1 },
                     lastTs: { $max: '$timestamp' },
                     avgLen: { $avg: '$dataLength' },
-                },
-            },
-            {
-                $project: {
+                } },
+            { $project: {
                     _id: 0,
                     deviceId: '$_id',
                     count: 1,
                     lastTs: 1,
                     avgDataLength: { $round: ['$avgLen', 2] },
-                },
-            },
+                } },
             { $sort: { count: -1 } },
             { $limit: limit },
         ]);
@@ -175,7 +161,7 @@ export class XRayService {
         if (from || to) {
             match.timestamp = {};
             if (from) match.timestamp.$gte = from;
-            if (to) match.timestamp.$lte = to;
+            if (to)   match.timestamp.$lte = to;
         }
 
         return this.model.aggregate([
