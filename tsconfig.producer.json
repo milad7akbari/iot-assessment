@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "apps/producer/src",
+    "outDir": "apps/producer/dist",
+    "types": ["node"]
+  },
+  "include": ["apps/producer/src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
