@@ -4,7 +4,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export type XRaySignalDocument = HydratedDocument<XRaySignal>;
 
-/* --- Subdocument for meta --- */
 @Schema({ _id: false })
 export class XRayMeta {
     @ApiProperty({ required: false })
@@ -21,7 +20,6 @@ export class XRayMeta {
 }
 export const XRayMetaSchema = SchemaFactory.createForClass(XRayMeta);
 
-/* --- Main document --- */
 @Schema({ collection: 'signals', timestamps: true })
 export class XRaySignal {
     @ApiProperty({ example: 'xray' })
@@ -41,12 +39,16 @@ export class XRaySignal {
     dataLength!: number;
 
     @ApiProperty({ required: false, type: () => XRayMeta })
-    @Prop({ type: XRayMetaSchema, _id: false })   // ← صراحت نوع
+    @Prop({ type: XRayMetaSchema, _id: false })
     meta?: XRayMeta;
 
     @ApiProperty({ required: false })
-    @Prop({ type: SchemaTypes.Mixed })            // ← برای هر نوعی از نمونهٔ خام
+    @Prop({ type: SchemaTypes.Mixed })
     rawSample?: unknown;
 }
 export const XRaySignalSchema = SchemaFactory.createForClass(XRaySignal);
 XRaySignalSchema.index({ deviceId: 1, timestamp: -1 });
+XRaySignalSchema.index({ timestamp: -1 });
+XRaySignalSchema.index({ dataLength: -1 });
+XRaySignalSchema.index({ deviceId: 1, dataLength: -1 });
+
